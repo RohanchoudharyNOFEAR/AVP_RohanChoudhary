@@ -24,6 +24,13 @@ protected:
 	virtual void OnConstruction(
 		const FTransform& Transform) override;
 
+#if WITH_EDITOR
+
+	virtual void PostEditChangeProperty(
+		FPropertyChangedEvent& PropertyChangedEvent) override;
+
+#endif
+
 public:
 
 	UPROPERTY(
@@ -51,12 +58,14 @@ public:
 	FArchObjectInfo ArchObjectInfo;
 
 	UPROPERTY(
-		BlueprintReadOnly,
+		EditInstanceOnly,
+		BlueprintReadWrite,
 		Category = "ArchViz")
 	bool bSelected = false;
 
 	UPROPERTY(
-		BlueprintReadOnly,
+		EditInstanceOnly,
+		BlueprintReadWrite,
 		Category = "ArchViz")
 	bool bHighlighted = false;
 
@@ -80,4 +89,5 @@ public:
 private:
 
 	void UpdateLabel();
+	void UpdateVisualState();
 };

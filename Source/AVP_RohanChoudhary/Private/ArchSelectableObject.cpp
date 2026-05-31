@@ -41,6 +41,7 @@ void AArchSelectableObject::OnConstruction(
 	Super::OnConstruction(Transform);
 
 	UpdateLabel();
+	UpdateVisualState();
 }
 
 void AArchSelectableObject::UpdateLabel()
@@ -66,7 +67,30 @@ void AArchSelectableObject::SetHighlightState(
 {
 	bHighlighted = bNewState;
 
-	if (bHighlighted)
+	UpdateVisualState();
+}
+
+void AArchSelectableObject::SetSelectedState(
+	bool bNewState)
+{
+	bSelected = bNewState;
+
+	UpdateVisualState();
+}
+
+void AArchSelectableObject::UpdateVisualState()
+{
+	if (!LabelText)
+	{
+		return;
+	}
+
+	if (bSelected)
+	{
+		LabelText->SetTextRenderColor(
+			FColor::Yellow);
+	}
+	else if (bHighlighted)
 	{
 		LabelText->SetTextRenderColor(
 			FColor::Green);
@@ -78,19 +102,43 @@ void AArchSelectableObject::SetHighlightState(
 	}
 }
 
-void AArchSelectableObject::SetSelectedState(
-	bool bNewState)
-{
-	bSelected = bNewState;
+#if WITH_EDITOR
 
-	if (bSelected)
+void AArchSelectableObject::PostEditChangeProperty(
+	FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(
+		PropertyChangedEvent);
+
+	const FName PropertyName =
+		PropertyChangedEvent.Property
+		? PropertyChangedEvent.Property->GetFName()
+		: NAME_None;
+
+	if (
+		PropertyName ==
+		GET_MEMBER_NAME_CHECKED(
+			AArchSelectableObject,
+			bSelected)
+		||
+		PropertyName ==
+		GET_MEMBER_NAME_CHECKED(
+			AArchSelectableObject,
+			bHighlighted)
+		)
 	{
-		LabelText->SetTextRenderColor(
-			FColor::Yellow);
+		UpdateVisualState();
 	}
-	else
+
+	if (
+		PropertyName ==
+		GET_MEMBER_NAME_CHECKED(
+			AArchSelectableObject,
+			ArchObjectInfo)
+		)
 	{
-		LabelText->SetTextRenderColor(
-			FColor::White);
+		UpdateLabel();
 	}
 }
+
+#endif
