@@ -19,6 +19,8 @@ public:
 
 	AArchSelectableObject();
 
+	UFUNCTION(CallInEditor)
+	void SelectThisObject();
 protected:
 
 	virtual void OnConstruction(
@@ -63,22 +65,13 @@ public:
 		Category = "ArchViz")
 	bool bSelected = false;
 
-	UPROPERTY(
-		EditInstanceOnly,
-		BlueprintReadWrite,
-		Category = "ArchViz")
-	bool bHighlighted = false;
+	
 
 	UFUNCTION(
 		BlueprintCallable,
 		Category = "ArchViz")
 	FArchObjectInfo GetObjectInfo() const;
 
-	UFUNCTION(
-		BlueprintCallable,
-		Category = "ArchViz")
-	void SetHighlightState(
-		bool bNewState);
 
 	UFUNCTION(
 		BlueprintCallable,

@@ -62,13 +62,7 @@ AArchSelectableObject::GetObjectInfo() const
 	return ArchObjectInfo;
 }
 
-void AArchSelectableObject::SetHighlightState(
-	bool bNewState)
-{
-	bHighlighted = bNewState;
 
-	UpdateVisualState();
-}
 
 void AArchSelectableObject::SetSelectedState(
 	bool bNewState)
@@ -85,21 +79,10 @@ void AArchSelectableObject::UpdateVisualState()
 		return;
 	}
 
-	if (bSelected)
-	{
-		LabelText->SetTextRenderColor(
-			FColor::Yellow);
-	}
-	else if (bHighlighted)
-	{
-		LabelText->SetTextRenderColor(
-			FColor::Green);
-	}
-	else
-	{
-		LabelText->SetTextRenderColor(
-			FColor::White);
-	}
+	LabelText->SetTextRenderColor(
+		bSelected
+		? FColor::Yellow
+		: FColor::White);
 }
 
 #if WITH_EDITOR
@@ -120,11 +103,6 @@ void AArchSelectableObject::PostEditChangeProperty(
 		GET_MEMBER_NAME_CHECKED(
 			AArchSelectableObject,
 			bSelected)
-		||
-		PropertyName ==
-		GET_MEMBER_NAME_CHECKED(
-			AArchSelectableObject,
-			bHighlighted)
 		)
 	{
 		UpdateVisualState();
@@ -142,3 +120,12 @@ void AArchSelectableObject::PostEditChangeProperty(
 }
 
 #endif
+
+void AArchSelectableObject::SelectThisObject()
+{
+	UE_LOG(
+		LogTemp,
+		Warning,
+		TEXT("Selected %s"),
+		*ArchObjectInfo.ObjectID.ToString());
+}

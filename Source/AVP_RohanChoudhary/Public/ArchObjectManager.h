@@ -17,6 +17,10 @@ public:
 
 	AArchObjectManager();
 
+	UFUNCTION(BlueprintCallable)
+	void SelectObject(
+		AArchSelectableObject* NewSelection);
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -41,5 +45,9 @@ public:
 		BlueprintReadOnly,
 		Category = "ArchViz")
 	TSet<FName> SelectedObjectIDs;
+
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	AArchSelectableObject* CurrentSelection = nullptr;
 
 };

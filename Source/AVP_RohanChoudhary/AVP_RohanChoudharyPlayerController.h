@@ -8,6 +8,8 @@
 
 class UInputMappingContext;
 class UUserWidget;
+class UInputAction;
+class AArchObjectManager;
 
 /**
  *  Basic PlayerController class for a third person game
@@ -48,5 +50,19 @@ protected:
 
 	/** Returns true if the player should use UMG touch controls */
 	bool ShouldUseTouchControls() const;
+
+	UPROPERTY(EditAnywhere, Category = "Input|Actions")
+	TObjectPtr<UInputAction> SelectAction;
+
+private:
+
+	UPROPERTY()
+	TObjectPtr<AArchObjectManager> CachedManager;
+
+private:
+
+	void HandleSelectPressed();
+
+	AArchObjectManager* FindManager();
 
 };

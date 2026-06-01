@@ -48,8 +48,7 @@ void AArchObjectManager::BuildObjectDatabase()
 			Info.DisplayName);
 
 		if (
-			SelectableObject->bSelected ||
-			SelectableObject->bHighlighted)
+			SelectableObject->bSelected)
 		{
 			SelectedObjectIDs.Add(
 				Info.ObjectID);
@@ -75,4 +74,39 @@ void AArchObjectManager::BuildObjectDatabase()
 			FColor::Cyan,
 			DebugText);
 	}
+}
+
+
+void AArchObjectManager::SelectObject(
+	AArchSelectableObject* NewSelection)
+{
+	if (!NewSelection)
+	{
+		return;
+	}
+
+	if (CurrentSelection == NewSelection)
+	{
+		return;
+	}
+
+
+	if (CurrentSelection)
+	{
+		CurrentSelection->SetSelectedState(false);
+
+		SelectedObjectIDs.Remove(
+			CurrentSelection
+			->GetObjectInfo()
+			.ObjectID);
+	}
+
+	CurrentSelection = NewSelection;
+
+	CurrentSelection->SetSelectedState(true);
+
+	SelectedObjectIDs.Add(
+		CurrentSelection
+		->GetObjectInfo()
+		.ObjectID);
 }
