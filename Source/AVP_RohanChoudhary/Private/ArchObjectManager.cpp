@@ -110,3 +110,9 @@ void AArchObjectManager::SelectObject(
 		->GetObjectInfo()
 		.ObjectID);
 }
+
+AArchSelectableObject*
+AArchObjectManager::GetCurrentSelection() const
+{
+	return CurrentSelection;
+}

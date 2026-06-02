@@ -21,6 +21,9 @@ public:
 	void SelectObject(
 		AArchSelectableObject* NewSelection);
 
+	UFUNCTION(BlueprintCallable)
+	AArchSelectableObject* GetCurrentSelection() const;
+
 protected:
 
 	virtual void BeginPlay() override;

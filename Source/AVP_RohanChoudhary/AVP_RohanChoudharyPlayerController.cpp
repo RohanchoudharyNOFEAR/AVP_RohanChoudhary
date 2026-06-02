@@ -10,6 +10,7 @@
 #include "Widgets/Input/SVirtualJoystick.h"
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
+#include "MeasurementUtility/MathDebugVisualizer.h"
 
 #include "ArchObjectManager.h"
 #include "ArchSelectableObject.h"
@@ -82,6 +83,15 @@ void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
 				this,
 				&AAVP_RohanChoudharyPlayerController::HandleSelectPressed);
 		}
+
+		if (ToggleMathDebugAction)
+		{
+			EnhancedInput->BindAction(
+				ToggleMathDebugAction,
+				ETriggerEvent::Started,
+				this,
+				&AAVP_RohanChoudharyPlayerController::HandleToggleMathDebug);
+		}
 	}
 }
 
@@ -144,5 +154,14 @@ void AAVP_RohanChoudharyPlayerController::HandleSelectPressed()
 	if (CachedManager)
 	{
 		CachedManager->SelectObject(Object);
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::HandleToggleMathDebug()
+{
+	for (TActorIterator<AMathDebugVisualizer> It(GetWorld()); It; ++It)
+	{
+		It->ToggleDebugMode();
+		break;
 	}
 }

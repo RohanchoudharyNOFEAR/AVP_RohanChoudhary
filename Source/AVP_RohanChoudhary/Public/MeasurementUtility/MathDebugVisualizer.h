@@ -20,6 +20,8 @@ class AVP_ROHANCHOUDHARY_API AMathDebugVisualizer : public AActor
 public:
 
 	AMathDebugVisualizer();
+	UFUNCTION(BlueprintCallable)
+	void ToggleDebugMode();
 
 protected:
 
@@ -99,5 +101,7 @@ private:
 
 	AArchObjectManager* FindManager();
 
-	void ToggleDebugMode();
+	
+
+	
 };

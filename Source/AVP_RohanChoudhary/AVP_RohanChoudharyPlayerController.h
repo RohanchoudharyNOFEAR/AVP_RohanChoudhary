@@ -19,19 +19,19 @@ UCLASS(abstract)
 class AAVP_RohanChoudharyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
+
 protected:
 
 	/** Input Mapping Contexts */
-	UPROPERTY(EditAnywhere, Category ="Input|Input Mappings")
+	UPROPERTY(EditAnywhere, Category = "Input|Input Mappings")
 	TArray<UInputMappingContext*> DefaultMappingContexts;
 
 	/** Input Mapping Contexts */
-	UPROPERTY(EditAnywhere, Category="Input|Input Mappings")
+	UPROPERTY(EditAnywhere, Category = "Input|Input Mappings")
 	TArray<UInputMappingContext*> MobileExcludedMappingContexts;
 
 	/** Mobile controls widget to spawn */
-	UPROPERTY(EditAnywhere, Category="Input|Touch Controls")
+	UPROPERTY(EditAnywhere, Category = "Input|Touch Controls")
 	TSubclassOf<UUserWidget> MobileControlsWidgetClass;
 
 	/** Pointer to the mobile controls widget */
@@ -54,10 +54,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input|Actions")
 	TObjectPtr<UInputAction> SelectAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input|Actions")
+	TObjectPtr < UInputAction> ToggleMathDebugAction;
+
 private:
 
 	UPROPERTY()
 	TObjectPtr<AArchObjectManager> CachedManager;
+
+	void HandleToggleMathDebug();
 
 private:
 
