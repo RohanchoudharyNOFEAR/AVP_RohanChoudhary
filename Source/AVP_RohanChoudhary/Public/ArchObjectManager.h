@@ -8,6 +8,8 @@
 #include "ArchObjectManager.generated.h"
 
 class AArchSelectableObject;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnArchObjectSelected, const FArchObjectInfo&);
 UCLASS()
 class AVP_ROHANCHOUDHARY_API AArchObjectManager : public AActor
 {
@@ -23,6 +25,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AArchSelectableObject* GetCurrentSelection() const;
+
+	UFUNCTION(BlueprintCallable, Category = "ArchViz")
+	void ToggleObjectIDs();
+
+	UFUNCTION(BlueprintPure, Category = "ArchViz")
+	bool IsShowingObjectIDs() const { return bShowObjectIDs; }
+
+	FOnArchObjectSelected OnObjectSelected;
 
 protected:
 
@@ -52,5 +62,8 @@ public:
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	AArchSelectableObject* CurrentSelection = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ArchViz")
+	bool bShowObjectIDs = true;
 
 };

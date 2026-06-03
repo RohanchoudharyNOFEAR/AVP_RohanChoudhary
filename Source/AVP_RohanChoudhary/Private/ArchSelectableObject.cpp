@@ -5,6 +5,9 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "ArchObjectManager.h"
+#include "BPL_ArchVizUtilities.h"
+#include "Kismet/GameplayStatics.h"
 
 AArchSelectableObject::AArchSelectableObject()
 {
@@ -46,14 +49,37 @@ void AArchSelectableObject::OnConstruction(
 
 void AArchSelectableObject::UpdateLabel()
 {
-	const FString LabelString =
-		FString::Printf(
+	bool bShowID = true;
+
+	if (UWorld* World = GetWorld())
+	{
+		TArray<AActor*> FoundManagers;
+		UGameplayStatics::GetAllActorsOfClass(World, AArchObjectManager::StaticClass(), FoundManagers);
+		if (FoundManagers.Num() > 0)
+		{
+			if (AArchObjectManager* Manager = Cast<AArchObjectManager>(FoundManagers[0]))
+			{
+				bShowID = Manager->IsShowingObjectIDs();
+			}
+		}
+	}
+
+	FString LabelString;
+	if (bShowID)
+	{
+		LabelString = FString::Printf(
 			TEXT("%s\n%s"),
 			*ArchObjectInfo.ObjectID.ToString(),
 			*ArchObjectInfo.DisplayName.ToString());
+	}
+	else
+	{
+		LabelString = FString::Printf(
+			TEXT("%s"),
+			*ArchObjectInfo.DisplayName.ToString());
+	}
 
-	LabelText->SetText(
-		FText::FromString(LabelString));
+	LabelText->SetText(FText::FromString(LabelString));
 }
 
 FArchObjectInfo
@@ -128,4 +154,10 @@ void AArchSelectableObject::SelectThisObject()
 		Warning,
 		TEXT("Selected %s"),
 		*ArchObjectInfo.ObjectID.ToString());
+}
+
+void AArchSelectableObject::OnObjectSelected_Implementation(const FArchObjectInfo& ObjectInfo)
+{
+	FString FormattedText = UBPL_ArchVizUtilities::FormatObjectInfo(ObjectInfo);
+	ARCHVIZ_LOG(TEXT("Selection Event Triggered:\n%s"), *FormattedText);
 }

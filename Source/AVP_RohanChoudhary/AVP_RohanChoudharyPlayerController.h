@@ -57,12 +57,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input|Actions")
 	TObjectPtr < UInputAction> ToggleMathDebugAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input|Actions")
+	TObjectPtr<UInputAction> ToggleObjectIDsAction;
+
 private:
 
 	UPROPERTY()
 	TObjectPtr<AArchObjectManager> CachedManager;
 
 	void HandleToggleMathDebug();
+
+	void HandleToggleObjectIDs();
 
 private:
 

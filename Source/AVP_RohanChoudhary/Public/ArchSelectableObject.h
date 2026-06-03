@@ -79,8 +79,12 @@ public:
 	void SetSelectedState(
 		bool bNewState);
 
-private:
+	UFUNCTION(BlueprintNativeEvent, Category = "ArchViz")
+	void OnObjectSelected(const FArchObjectInfo& ObjectInfo);
 
 	void UpdateLabel();
+
+private:
+
 	void UpdateVisualState();
 };

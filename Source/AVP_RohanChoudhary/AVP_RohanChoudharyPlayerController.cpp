@@ -92,6 +92,15 @@ void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
 				this,
 				&AAVP_RohanChoudharyPlayerController::HandleToggleMathDebug);
 		}
+
+		if (ToggleObjectIDsAction)
+		{
+			EnhancedInput->BindAction(
+				ToggleObjectIDsAction,
+				ETriggerEvent::Started,
+				this,
+				&AAVP_RohanChoudharyPlayerController::HandleToggleObjectIDs);
+		}
 	}
 }
 
@@ -163,5 +172,13 @@ void AAVP_RohanChoudharyPlayerController::HandleToggleMathDebug()
 	{
 		It->ToggleDebugMode();
 		break;
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::HandleToggleObjectIDs()
+{
+	if (CachedManager)
+	{
+		CachedManager->ToggleObjectIDs();
 	}
 }

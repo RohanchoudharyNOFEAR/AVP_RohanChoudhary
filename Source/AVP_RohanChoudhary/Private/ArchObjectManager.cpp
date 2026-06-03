@@ -105,14 +105,33 @@ void AArchObjectManager::SelectObject(
 
 	CurrentSelection->SetSelectedState(true);
 
-	SelectedObjectIDs.Add(
-		CurrentSelection
-		->GetObjectInfo()
-		.ObjectID);
+	const FArchObjectInfo Info = CurrentSelection->GetObjectInfo();
+
+	SelectedObjectIDs.Add(Info.ObjectID);
+
+	// Broadcast selection events
+	CurrentSelection->OnObjectSelected(Info);
+	OnObjectSelected.Broadcast(Info);
 }
 
 AArchSelectableObject*
 AArchObjectManager::GetCurrentSelection() const
 {
 	return CurrentSelection;
+}
+
+void AArchObjectManager::ToggleObjectIDs()
+{
+	bShowObjectIDs = !bShowObjectIDs;
+
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AArchSelectableObject::StaticClass(), FoundActors);
+
+	for (AActor* Actor : FoundActors)
+	{
+		if (AArchSelectableObject* SelectableObject = Cast<AArchSelectableObject>(Actor))
+		{
+			SelectableObject->UpdateLabel();
+		}
+	}
 }
