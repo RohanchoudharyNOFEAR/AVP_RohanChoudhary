@@ -8,6 +8,7 @@
 #include "ArchObjectManager.h"
 #include "BPL_ArchVizUtilities.h"
 #include "Kismet/GameplayStatics.h"
+#include "ArchObjectInfoComponent.h"
 
 AArchSelectableObject::AArchSelectableObject()
 {
@@ -36,12 +37,34 @@ AArchSelectableObject::AArchSelectableObject()
 		EHorizTextAligment::EHTA_Center);
 
 	LabelText->SetWorldSize(30.f);
+
+	ObjectInfoComponent =
+		CreateDefaultSubobject<UArchObjectInfoComponent>(
+			TEXT("ObjectInfoComponent"));
 }
 
 void AArchSelectableObject::OnConstruction(
 	const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
+
+	if (ObjectInfoComponent)
+	{
+		if (ObjectInfoComponent->ObjectID.IsNone() && !ArchObjectInfo.ObjectID.IsNone())
+		{
+			ObjectInfoComponent->ObjectID = ArchObjectInfo.ObjectID;
+			ObjectInfoComponent->DisplayName = ArchObjectInfo.DisplayName;
+			ObjectInfoComponent->Category = ArchObjectInfo.Category;
+			ObjectInfoComponent->RoomName = ArchObjectInfo.RoomName;
+		}
+		else
+		{
+			ArchObjectInfo.ObjectID = ObjectInfoComponent->ObjectID;
+			ArchObjectInfo.DisplayName = ObjectInfoComponent->DisplayName;
+			ArchObjectInfo.Category = ObjectInfoComponent->Category;
+			ArchObjectInfo.RoomName = ObjectInfoComponent->RoomName;
+		}
+	}
 
 	UpdateLabel();
 	UpdateVisualState();
@@ -64,19 +87,22 @@ void AArchSelectableObject::UpdateLabel()
 		}
 	}
 
+	FName DisplayID = ObjectInfoComponent ? ObjectInfoComponent->ObjectID : ArchObjectInfo.ObjectID;
+	FText DisplayNameVal = ObjectInfoComponent ? ObjectInfoComponent->DisplayName : ArchObjectInfo.DisplayName;
+
 	FString LabelString;
 	if (bShowID)
 	{
 		LabelString = FString::Printf(
 			TEXT("%s\n%s"),
-			*ArchObjectInfo.ObjectID.ToString(),
-			*ArchObjectInfo.DisplayName.ToString());
+			*DisplayID.ToString(),
+			*DisplayNameVal.ToString());
 	}
 	else
 	{
 		LabelString = FString::Printf(
 			TEXT("%s"),
-			*ArchObjectInfo.DisplayName.ToString());
+			*DisplayNameVal.ToString());
 	}
 
 	LabelText->SetText(FText::FromString(LabelString));
@@ -158,6 +184,15 @@ void AArchSelectableObject::SelectThisObject()
 
 void AArchSelectableObject::OnObjectSelected_Implementation(const FArchObjectInfo& ObjectInfo)
 {
-	FString FormattedText = UBPL_ArchVizUtilities::FormatObjectInfo(ObjectInfo);
-	ARCHVIZ_LOG(TEXT("Selection Event Triggered:\n%s"), *FormattedText);
+	FString FormattedText = "";
+	if (ObjectInfoComponent)
+	{
+		FormattedText = ObjectInfoComponent->GetFormattedObjectInfo();
+	}
+	else
+	{
+		FormattedText = UBPL_ArchVizUtilities::FormatObjectInfo(ObjectInfo);
+	}
+	
+	ARCHVIZ_LOG(TEXT("Selection Event Triggered (Component):\n%s"), *FormattedText);
 }

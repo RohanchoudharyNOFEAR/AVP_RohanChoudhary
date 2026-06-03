@@ -10,6 +10,7 @@
 
 class UStaticMeshComponent;
 class UTextRenderComponent;
+class UArchObjectInfoComponent;
 UCLASS()
 class AVP_ROHANCHOUDHARY_API AArchSelectableObject : public AActor
 {
@@ -52,6 +53,13 @@ public:
 		BlueprintReadOnly,
 		Category = "Components")
 	UTextRenderComponent* LabelText;
+
+	UPROPERTY(
+		VisibleAnywhere,
+		BlueprintReadOnly,
+		Category = "Components",
+		meta = (AllowPrivateAccess = "true"))
+	UArchObjectInfoComponent* ObjectInfoComponent;
 
 	UPROPERTY(
 		EditAnywhere,
