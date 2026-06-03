@@ -11,10 +11,9 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 #include "MeasurementUtility/MathDebugVisualizer.h"
-
 #include "ArchObjectManager.h"
 #include "ArchSelectableObject.h"
-
+#include "TypePracticeDisplay.h"
 #include "EngineUtils.h"
 
 void AAVP_RohanChoudharyPlayerController::BeginPlay()
@@ -101,6 +100,15 @@ void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
 				this,
 				&AAVP_RohanChoudharyPlayerController::HandleToggleObjectIDs);
 		}
+
+		if (RefreshDebugAction)
+		{
+			EnhancedInput->BindAction(
+				RefreshDebugAction,
+				ETriggerEvent::Started,
+				this,
+				&AAVP_RohanChoudharyPlayerController::HandleRefreshDebug);
+		}
 	}
 }
 
@@ -180,5 +188,13 @@ void AAVP_RohanChoudharyPlayerController::HandleToggleObjectIDs()
 	if (CachedManager)
 	{
 		CachedManager->ToggleObjectIDs();
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::HandleRefreshDebug()
+{
+	for (TActorIterator<ATypePracticeDisplay> It(GetWorld()); It; ++It)
+	{
+		It->RefreshDisplay();
 	}
 }

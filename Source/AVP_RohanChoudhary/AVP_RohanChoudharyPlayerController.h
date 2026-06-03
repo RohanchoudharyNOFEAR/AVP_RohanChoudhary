@@ -60,6 +60,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input|Actions")
 	TObjectPtr<UInputAction> ToggleObjectIDsAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input|Actions")
+	TObjectPtr<UInputAction> RefreshDebugAction;
+
 private:
 
 	UPROPERTY()
@@ -68,6 +71,8 @@ private:
 	void HandleToggleMathDebug();
 
 	void HandleToggleObjectIDs();
+
+	void HandleRefreshDebug();
 
 private:
 
