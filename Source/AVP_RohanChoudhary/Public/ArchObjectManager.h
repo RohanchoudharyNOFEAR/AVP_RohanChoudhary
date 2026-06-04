@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "ArchViz")
 	bool IsShowingObjectIDs() const { return bShowObjectIDs; }
 
+	UFUNCTION(BlueprintCallable, Category = "ArchViz")
+	bool GetMetadataForObject(FName ObjectID, FArchObjectCSVRow& OutRow) const;
+
 	FOnArchObjectSelected OnObjectSelected;
 
 protected:
@@ -65,5 +68,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ArchViz")
 	bool bShowObjectIDs = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ArchViz")
+	class UDataTable* ArchObjectDataTable = nullptr;
 
 };

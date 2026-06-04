@@ -135,3 +135,21 @@ void AArchObjectManager::ToggleObjectIDs()
 		}
 	}
 }
+
+bool AArchObjectManager::GetMetadataForObject(FName ObjectID, FArchObjectCSVRow& OutRow) const
+{
+	if (!ArchObjectDataTable)
+	{
+		return false;
+	}
+
+	static const FString ContextString(TEXT("ArchObjectManager CSV LookUp"));
+	FArchObjectCSVRow* Row = ArchObjectDataTable->FindRow<FArchObjectCSVRow>(ObjectID, ContextString);
+	if (Row)
+	{
+		OutRow = *Row;
+		return true;
+	}
+
+	return false;
+}

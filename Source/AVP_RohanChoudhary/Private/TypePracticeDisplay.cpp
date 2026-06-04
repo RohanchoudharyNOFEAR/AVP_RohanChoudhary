@@ -83,18 +83,46 @@ void ATypePracticeDisplay::HandleObjectSelected(const FArchObjectInfo& ObjectInf
 	if (SelectedActor)
 	{
 		SelectedObjectID = ObjectInfo.ObjectID;
-		SelectedDisplayName = ObjectInfo.DisplayName;
 		SelectedLocation = SelectedActor->GetActorLocation();
 		SelectedRotation = SelectedActor->GetActorRotation();
-		SelectedCategory = ObjectInfo.Category;
 
-		if (SelectedActor->ObjectInfoComponent)
+		bHasCSVMetadata = false;
+		TArray<AActor*> FoundManagers;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AArchObjectManager::StaticClass(), FoundManagers);
+		if (FoundManagers.Num() > 0)
 		{
-			SelectedNotes = SelectedActor->ObjectInfoComponent->Notes;
+			if (AArchObjectManager* Manager = Cast<AArchObjectManager>(FoundManagers[0]))
+			{
+				FArchObjectCSVRow CSVRow;
+				if (Manager->GetMetadataForObject(ObjectInfo.ObjectID, CSVRow))
+				{
+					SelectedDisplayName = CSVRow.DisplayName;
+					SelectedCategory = CSVRow.Category;
+					SelectedRoomName = CSVRow.RoomName;
+					SelectedAreaSqM = CSVRow.AreaSqM;
+					SelectedMaterialGroup = CSVRow.MaterialGroup;
+					SelectedDescription = CSVRow.Description;
+					bHasCSVMetadata = true;
+				}
+			}
 		}
-		else
+
+		if (!bHasCSVMetadata)
 		{
-			SelectedNotes = TEXT("No Component Attached");
+			SelectedDisplayName = ObjectInfo.DisplayName;
+			SelectedCategory = ObjectInfo.Category;
+			SelectedRoomName = ObjectInfo.RoomName;
+			SelectedMaterialGroup = ObjectInfo.MaterialGroup;
+			SelectedAreaSqM = 0.0f;
+			SelectedDescription = TEXT("");
+			if (SelectedActor->ObjectInfoComponent)
+			{
+				SelectedNotes = SelectedActor->ObjectInfoComponent->Notes;
+			}
+			else
+			{
+				SelectedNotes = TEXT("No Component Attached");
+			}
 		}
 	}
 
@@ -105,25 +133,63 @@ void ATypePracticeDisplay::UpdateDisplayText()
 {
 	if (!DebugText) return;
 
-	FString CategoryStr = UEnum::GetDisplayValueAsText(SelectedCategory).ToString();
-	FString DisplayStr = FString::Printf(
-		TEXT("=== ARCHVIZ DEBUG PANEL ===\n")
-		TEXT("Selected ID: %s\n")
-		TEXT("Display Name: %s\n")
-		TEXT("Location: X=%.1f Y=%.1f Z=%.1f\n")
-		TEXT("Rotation: P=%.1f Y=%.1f R=%.1f\n")
-		TEXT("Category: %s\n")
-		TEXT("Notes: %s\n")
-		TEXT("---------------------------\n")
-		TEXT("Total Registered Objects: %d"),
-		*SelectedObjectID.ToString(),
-		*SelectedDisplayName.ToString(),
-		SelectedLocation.X, SelectedLocation.Y, SelectedLocation.Z,
-		SelectedRotation.Pitch, SelectedRotation.Yaw, SelectedRotation.Roll,
-		*CategoryStr,
-		*SelectedNotes,
-		AllSelectableObjects.Num()
-	);
+	FString DisplayStr;
+	if (SelectedObjectID.IsNone())
+	{
+		DisplayStr = FString::Printf(
+			TEXT("=== ARCHVIZ DEBUG PANEL ===\n")
+			TEXT("No object selected.\n")
+			TEXT("---------------------------\n")
+			TEXT("Total Registered Objects: %d"),
+			AllSelectableObjects.Num()
+		);
+	}
+	else if (bHasCSVMetadata)
+	{
+		FString CategoryStr = UEnum::GetDisplayValueAsText(SelectedCategory).ToString();
+		DisplayStr = FString::Printf(
+			TEXT("=== ARCHVIZ DEBUG PANEL ===\n")
+			TEXT("Selected ID: %s (CSV Loaded)\n")
+			TEXT("Display Name: %s\n")
+			TEXT("Location: X=%.1f Y=%.1f Z=%.1f\n")
+			TEXT("Rotation: P=%.1f Y=%.1f R=%.1f\n")
+			TEXT("Category: %s\n")
+			TEXT("Room Name: %s\n")
+			TEXT("Area: %.2f sq m\n")
+			TEXT("Material Group: %s\n")
+			TEXT("Description: %s\n")
+			TEXT("---------------------------\n")
+			TEXT("Total Registered Objects: %d"),
+			*SelectedObjectID.ToString(),
+			*SelectedDisplayName.ToString(),
+			SelectedLocation.X, SelectedLocation.Y, SelectedLocation.Z,
+			SelectedRotation.Pitch, SelectedRotation.Yaw, SelectedRotation.Roll,
+			*CategoryStr,
+			*SelectedRoomName.ToString(),
+			SelectedAreaSqM,
+			*SelectedMaterialGroup.ToString(),
+			*SelectedDescription,
+			AllSelectableObjects.Num()
+		);
+	}
+	else
+	{
+		FString CategoryStr = UEnum::GetDisplayValueAsText(SelectedCategory).ToString();
+		DisplayStr = FString::Printf(
+			TEXT("=== ARCHVIZ DEBUG PANEL ===\n")
+			TEXT("Selected ID: %s\n")
+			TEXT("Location: X=%.1f Y=%.1f Z=%.1f\n")
+			TEXT("Rotation: P=%.1f Y=%.1f R=%.1f\n")
+			TEXT("---------------------------\n")
+			TEXT("WARNING: NO MATCHING CSV ROW FOUND!\n")
+			TEXT("---------------------------\n")
+			TEXT("Total Registered Objects: %d"),
+			*SelectedObjectID.ToString(),
+			SelectedLocation.X, SelectedLocation.Y, SelectedLocation.Z,
+			SelectedRotation.Pitch, SelectedRotation.Yaw, SelectedRotation.Roll,
+			AllSelectableObjects.Num()
+		);
+	}
 
 	DebugText->SetText(FText::FromString(DisplayStr));
 }

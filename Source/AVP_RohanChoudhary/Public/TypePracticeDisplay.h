@@ -65,6 +65,21 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TypePractice")
 	FString SelectedNotes;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TypePractice")
+	FName SelectedRoomName;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TypePractice")
+	float SelectedAreaSqM = 0.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TypePractice")
+	FName SelectedMaterialGroup;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TypePractice")
+	FString SelectedDescription;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TypePractice")
+	bool bHasCSVMetadata = false;
+
 	// Demonstrating TArray: Dynamic array of all selectable objects in the showroom
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "TypePractice")
 	TArray<AArchSelectableObject*> AllSelectableObjects;

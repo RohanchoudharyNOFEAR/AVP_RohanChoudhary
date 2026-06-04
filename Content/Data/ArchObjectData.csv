@@ -1,0 +1,6 @@
+Name,ObjectID,DisplayName,Category,RoomName,AreaSqM,MaterialGroup,Description
+Chair01,Chair01,Luxury Armchair,Furniture,LivingRoom,1.2,FabricGroup,A luxurious fabric armchair for relaxation.
+Chair02,Chair02,Ergonomic Office Chair,Furniture,Office,0.8,LeatherGroup,An ergonomic chair with lumbar support.
+Table01,Table01,Round Dining Table,Furniture,DiningRoom,2.5,WoodGroup,A solid oak round dining table.
+Chair03,Chair03,Modern Lounge Chair,Furniture,LivingRoom,1.5,LeatherGroup,A sleek modern lounge chair.
+Table02,Table02,Minimalist Desk,Furniture,Office,1.8,MetalGroup,A minimalist desk with steel frame.

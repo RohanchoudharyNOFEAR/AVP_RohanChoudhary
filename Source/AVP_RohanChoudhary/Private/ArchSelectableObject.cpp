@@ -185,14 +185,39 @@ void AArchSelectableObject::SelectThisObject()
 void AArchSelectableObject::OnObjectSelected_Implementation(const FArchObjectInfo& ObjectInfo)
 {
 	FString FormattedText = "";
-	if (ObjectInfoComponent)
+	bool bFoundCSV = false;
+
+	TArray<AActor*> FoundManagers;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AArchObjectManager::StaticClass(), FoundManagers);
+	if (FoundManagers.Num() > 0)
 	{
-		FormattedText = ObjectInfoComponent->GetFormattedObjectInfo();
+		if (AArchObjectManager* Manager = Cast<AArchObjectManager>(FoundManagers[0]))
+		{
+			FArchObjectCSVRow CSVRow;
+			if (Manager->GetMetadataForObject(ObjectInfo.ObjectID, CSVRow))
+			{
+				bFoundCSV = true;
+				FString CategoryStr = UEnum::GetDisplayValueAsText(CSVRow.Category).ToString();
+				FormattedText = FString::Printf(
+					TEXT("Object ID: %s (CSV Loaded)\nName: %s\nCategory: %s\nRoom: %s\nArea: %.2f sq m\nMaterial Group: %s\nDescription: %s"),
+					*CSVRow.ObjectID.ToString(),
+					*CSVRow.DisplayName.ToString(),
+					*CategoryStr,
+					*CSVRow.RoomName.ToString(),
+					CSVRow.AreaSqM,
+					*CSVRow.MaterialGroup.ToString(),
+					*CSVRow.Description
+				);
+			}
+		}
+	}
+
+	if (bFoundCSV)
+	{
+		ARCHVIZ_LOG(TEXT("Selection Event Triggered:\n%s"), *FormattedText);
 	}
 	else
 	{
-		FormattedText = UBPL_ArchVizUtilities::FormatObjectInfo(ObjectInfo);
+		ARCHVIZ_LOG(TEXT("WARNING: No matching CSV row found for ObjectID: %s"), *ObjectInfo.ObjectID.ToString());
 	}
-	
-	ARCHVIZ_LOG(TEXT("Selection Event Triggered (Component):\n%s"), *FormattedText);
 }

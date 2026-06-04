@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "ArchObjectTypes.generated.h"
 
 UENUM(BlueprintType)
@@ -34,4 +35,31 @@ struct FArchObjectInfo
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FName MaterialGroup;
+};
+
+USTRUCT(BlueprintType)
+struct FArchObjectCSVRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ArchViz")
+	FName ObjectID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ArchViz")
+	FText DisplayName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ArchViz")
+	EArchObjectCategory Category = EArchObjectCategory::Furniture;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ArchViz")
+	FName RoomName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ArchViz")
+	float AreaSqM = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ArchViz")
+	FName MaterialGroup;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ArchViz")
+	FString Description;
 };
