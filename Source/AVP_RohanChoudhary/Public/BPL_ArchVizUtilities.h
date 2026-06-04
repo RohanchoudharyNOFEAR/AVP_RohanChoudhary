@@ -29,5 +29,8 @@ public:
 	/** Exposes the consistent ARCHVIZ_LOG debug macro to Blueprints */
 	UFUNCTION(BlueprintCallable, Category = "ArchViz")
 	static void PrintDebugMessage(const FString& Message);
+
+	UFUNCTION(BlueprintCallable, Category = "ArchViz")
+	static bool ExportReviewNoteToCSV(const FString& ObjectID, const FString& DisplayName, const FString& RoomName, const FString& Note, FString& OutMessage);
 	
 };

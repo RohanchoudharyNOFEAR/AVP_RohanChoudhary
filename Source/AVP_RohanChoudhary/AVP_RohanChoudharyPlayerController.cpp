@@ -14,6 +14,7 @@
 #include "ArchObjectManager.h"
 #include "ArchSelectableObject.h"
 #include "TypePracticeDisplay.h"
+#include "BPL_ArchVizUtilities.h"
 #include "EngineUtils.h"
 
 void AAVP_RohanChoudharyPlayerController::BeginPlay()
@@ -43,6 +44,15 @@ void AAVP_RohanChoudharyPlayerController::BeginPlay()
 	CachedManager = FindManager();
 
 	bShowMouseCursor = true;
+
+	if (ReviewNotesWidgetClass && IsLocalPlayerController())
+	{
+		ReviewNotesWidget = CreateWidget<UUserWidget>(this, ReviewNotesWidgetClass);
+		if (ReviewNotesWidget)
+		{
+			ReviewNotesWidget->AddToViewport(10);
+		}
+	}
 }
 
 void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
@@ -109,6 +119,11 @@ void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
 				this,
 				&AAVP_RohanChoudharyPlayerController::HandleRefreshDebug);
 		}
+	}
+
+	if (InputComponent)
+	{
+		InputComponent->BindKey(EKeys::N, IE_Pressed, this, &AAVP_RohanChoudharyPlayerController::HandleSaveTempNote);
 	}
 }
 
@@ -196,5 +211,29 @@ void AAVP_RohanChoudharyPlayerController::HandleRefreshDebug()
 	for (TActorIterator<ATypePracticeDisplay> It(GetWorld()); It; ++It)
 	{
 		It->RefreshDisplay();
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::HandleSaveTempNote()
+{
+	if (!CachedManager) return;
+
+	AArchSelectableObject* Selected = CachedManager->GetCurrentSelection();
+	if (Selected)
+	{
+		FArchObjectInfo Info = Selected->GetObjectInfo();
+		FString Msg;
+		UBPL_ArchVizUtilities::ExportReviewNoteToCSV(
+			Info.ObjectID.ToString(),
+			Info.DisplayName.ToString(),
+			Info.RoomName.ToString(),
+			TEXT("Temporary Hardcoded Note Test"),
+			Msg
+		);
+		ARCHVIZ_LOG(TEXT("Temp Export: %s"), *Msg);
+	}
+	else
+	{
+		ARCHVIZ_LOG(TEXT("Temp Export WARNING: No object selected to save temp note."));
 	}
 }

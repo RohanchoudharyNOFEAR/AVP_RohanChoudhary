@@ -38,6 +38,12 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UUserWidget> MobileControlsWidget;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> ReviewNotesWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* ReviewNotesWidget = nullptr;
+
 	/** If true, the player will use UMG touch controls even if not playing on mobile platforms */
 	UPROPERTY(EditAnywhere, Config, Category = "Input|Touch Controls")
 	bool bForceTouchControls = false;
@@ -73,6 +79,8 @@ private:
 	void HandleToggleObjectIDs();
 
 	void HandleRefreshDebug();
+
+	void HandleSaveTempNote();
 
 private:
 
