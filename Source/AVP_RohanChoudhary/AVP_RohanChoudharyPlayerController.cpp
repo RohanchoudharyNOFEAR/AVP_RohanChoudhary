@@ -45,14 +45,7 @@ void AAVP_RohanChoudharyPlayerController::BeginPlay()
 
 	bShowMouseCursor = true;
 
-	if (ObjectInfoPanelWidgetClass && IsLocalPlayerController())
-	{
-		ObjectInfoPanelWidget = CreateWidget<UUserWidget>(this, ObjectInfoPanelWidgetClass);
-		if (ObjectInfoPanelWidget)
-		{
-			ObjectInfoPanelWidget->AddToViewport(10);
-		}
-	}
+
 }
 
 void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
@@ -124,6 +117,7 @@ void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
 	if (InputComponent)
 	{
 		InputComponent->BindKey(EKeys::N, IE_Pressed, this, &AAVP_RohanChoudharyPlayerController::HandleSaveTempNote);
+		InputComponent->BindKey(EKeys::H, IE_Pressed, this, &AAVP_RohanChoudharyPlayerController::ToggleControlsOverlay);
 	}
 }
 
@@ -146,6 +140,7 @@ bool AAVP_RohanChoudharyPlayerController::ShouldUseTouchControls() const
 
 void AAVP_RohanChoudharyPlayerController::HandleSelectPressed()
 {
+	ShowInputDebugMessage(TEXT("Select Object"));
 
 	UE_LOG(
 		LogTemp,
@@ -191,6 +186,8 @@ void AAVP_RohanChoudharyPlayerController::HandleSelectPressed()
 
 void AAVP_RohanChoudharyPlayerController::HandleToggleMathDebug()
 {
+	ShowInputDebugMessage(TEXT("Toggle Math Debug"));
+
 	for (TActorIterator<AMathDebugVisualizer> It(GetWorld()); It; ++It)
 	{
 		It->ToggleDebugMode();
@@ -200,6 +197,8 @@ void AAVP_RohanChoudharyPlayerController::HandleToggleMathDebug()
 
 void AAVP_RohanChoudharyPlayerController::HandleToggleObjectIDs()
 {
+	ShowInputDebugMessage(TEXT("Toggle Object IDs"));
+
 	if (CachedManager)
 	{
 		CachedManager->ToggleObjectIDs();
@@ -208,6 +207,8 @@ void AAVP_RohanChoudharyPlayerController::HandleToggleObjectIDs()
 
 void AAVP_RohanChoudharyPlayerController::HandleRefreshDebug()
 {
+	ShowInputDebugMessage(TEXT("Refresh Debug"));
+
 	for (TActorIterator<ATypePracticeDisplay> It(GetWorld()); It; ++It)
 	{
 		It->RefreshDisplay();
@@ -216,6 +217,8 @@ void AAVP_RohanChoudharyPlayerController::HandleRefreshDebug()
 
 void AAVP_RohanChoudharyPlayerController::HandleSaveTempNote()
 {
+	ShowInputDebugMessage(TEXT("Export Review Note"));
+
 	if (!CachedManager) return;
 
 	AArchSelectableObject* Selected = CachedManager->GetCurrentSelection();
@@ -235,5 +238,44 @@ void AAVP_RohanChoudharyPlayerController::HandleSaveTempNote()
 	else
 	{
 		ARCHVIZ_LOG(TEXT("Temp Export WARNING: No object selected to save temp note."));
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::ShowInputDebugMessage(const FString& ActionName)
+{
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			4444,
+			5.0f,
+			FColor::Green,
+			FString::Printf(TEXT("Last Input Action: %s"), *ActionName)
+		);
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::ToggleControlsOverlay()
+{
+	ShowInputDebugMessage(TEXT("Toggle Controls Overlay (H Key)"));
+
+	if (!ControlsOverlayWidget && ControlsOverlayWidgetClass)
+	{
+		ControlsOverlayWidget = CreateWidget<UUserWidget>(this, ControlsOverlayWidgetClass);
+		if (ControlsOverlayWidget)
+		{
+			ControlsOverlayWidget->AddToViewport(15);
+		}
+	}
+	else if (ControlsOverlayWidget)
+	{
+		if (ControlsOverlayWidget->GetVisibility() == ESlateVisibility::Visible ||
+			ControlsOverlayWidget->GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
+		{
+			ControlsOverlayWidget->SetVisibility(ESlateVisibility::Collapsed);
+		}
+		else
+		{
+			ControlsOverlayWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+		}
 	}
 }

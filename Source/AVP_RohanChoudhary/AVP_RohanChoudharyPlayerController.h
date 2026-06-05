@@ -50,10 +50,22 @@ protected:
 	UPROPERTY()
 	UUserWidget* ObjectInfoPanelWidget = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> ControlsOverlayWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* ControlsOverlayWidget = nullptr;
+
 	/** If true, the player will use UMG touch controls even if not playing on mobile platforms */
 	UPROPERTY(EditAnywhere, Config, Category = "Input|Touch Controls")
 	bool bForceTouchControls = false;
 
+public:
+	void ShowInputDebugMessage(const FString& ActionName);
+
+	void ToggleControlsOverlay();
+
+protected:
 	/** Gameplay initialization */
 	virtual void BeginPlay() override;
 

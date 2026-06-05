@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "AVP_RohanChoudhary.h"
+#include "AVP_RohanChoudharyPlayerController.h"
 
 AAVP_RohanChoudharyCharacter::AAVP_RohanChoudharyCharacter()
 {
@@ -79,6 +80,11 @@ void AAVP_RohanChoudharyCharacter::Move(const FInputActionValue& Value)
 
 	// route the input
 	DoMove(MovementVector.X, MovementVector.Y);
+
+	if (AAVP_RohanChoudharyPlayerController* PC = Cast<AAVP_RohanChoudharyPlayerController>(GetController()))
+	{
+		PC->ShowInputDebugMessage(TEXT("Move"));
+	}
 }
 
 void AAVP_RohanChoudharyCharacter::Look(const FInputActionValue& Value)
@@ -88,6 +94,11 @@ void AAVP_RohanChoudharyCharacter::Look(const FInputActionValue& Value)
 
 	// route the input
 	DoLook(LookAxisVector.X, LookAxisVector.Y);
+
+	if (AAVP_RohanChoudharyPlayerController* PC = Cast<AAVP_RohanChoudharyPlayerController>(GetController()))
+	{
+		PC->ShowInputDebugMessage(TEXT("Look"));
+	}
 }
 
 void AAVP_RohanChoudharyCharacter::DoMove(float Right, float Forward)
@@ -130,4 +141,13 @@ void AAVP_RohanChoudharyCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+void AAVP_RohanChoudharyCharacter::Jump()
+{
+	Super::Jump();
+	if (AAVP_RohanChoudharyPlayerController* PC = Cast<AAVP_RohanChoudharyPlayerController>(GetController()))
+	{
+		PC->ShowInputDebugMessage(TEXT("Jump"));
+	}
 }
