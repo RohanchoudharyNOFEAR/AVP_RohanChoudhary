@@ -45,12 +45,12 @@ void AAVP_RohanChoudharyPlayerController::BeginPlay()
 
 	bShowMouseCursor = true;
 
-	if (ReviewNotesWidgetClass && IsLocalPlayerController())
+	if (ObjectInfoPanelWidgetClass && IsLocalPlayerController())
 	{
-		ReviewNotesWidget = CreateWidget<UUserWidget>(this, ReviewNotesWidgetClass);
-		if (ReviewNotesWidget)
+		ObjectInfoPanelWidget = CreateWidget<UUserWidget>(this, ObjectInfoPanelWidgetClass);
+		if (ObjectInfoPanelWidget)
 		{
-			ReviewNotesWidget->AddToViewport(10);
+			ObjectInfoPanelWidget->AddToViewport(10);
 		}
 	}
 }
