@@ -12,6 +12,7 @@ class UUserWidget;
 class UInputAction;
 class AArchObjectManager;
 class AArchSelectableObject;
+class UDataLayerAsset;
 
 /**
  *  Basic PlayerController class for a third person game
@@ -67,6 +68,9 @@ public:
 
 	void ToggleControlsOverlay();
 
+	UFUNCTION(BlueprintCallable, Category = "DataLayers")
+	void HandleToggleFurniture();
+
 	virtual void Tick(float DeltaTime) override;
 
 protected:
@@ -93,6 +97,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Input|Actions")
 	TObjectPtr<UInputAction> BackAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input|Actions")
+	TObjectPtr<UInputAction> ToggleFurnitureAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataLayers")
+	TObjectPtr<UDataLayerAsset> FurnitureDataLayerAsset;
 
 private:
 

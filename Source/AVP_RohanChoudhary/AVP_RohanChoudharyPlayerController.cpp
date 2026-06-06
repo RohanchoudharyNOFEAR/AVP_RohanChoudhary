@@ -16,6 +16,10 @@
 #include "TypePracticeDisplay.h"
 #include "BPL_ArchVizUtilities.h"
 #include "EngineUtils.h"
+#include "Kismet/GameplayStatics.h"
+#include "WorldPartition/DataLayer/DataLayerSubsystem.h"
+#include "WorldPartition/DataLayer/DataLayerAsset.h"
+#include "WorldPartition/DataLayer/DataLayerInstance.h"
 
 void AAVP_RohanChoudharyPlayerController::BeginPlay()
 {
@@ -121,6 +125,15 @@ void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
 				ETriggerEvent::Started,
 				this,
 				&AAVP_RohanChoudharyPlayerController::HandleBackPressed);
+		}
+
+		if (ToggleFurnitureAction)
+		{
+			EnhancedInput->BindAction(
+				ToggleFurnitureAction,
+				ETriggerEvent::Started,
+				this,
+				&AAVP_RohanChoudharyPlayerController::HandleToggleFurniture);
 		}
 	}
 
@@ -377,5 +390,35 @@ void AAVP_RohanChoudharyPlayerController::HandleObjectSelectedStateChanged(const
 	else
 	{
 		SetNavigationMode(true);
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::HandleToggleFurniture()
+{
+	// Log the input event
+	UE_LOG(LogTemp, Warning, TEXT("Toggle Furniture Data Layer input event received."));
+
+	if (!FurnitureDataLayerAsset)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("FurnitureDataLayerAsset is not assigned in the Player Controller!"));
+		return;
+	}
+
+	UDataLayerSubsystem* DataLayerSubsystem = UWorld::GetSubsystem<UDataLayerSubsystem>(GetWorld());
+	if (DataLayerSubsystem)
+	{
+		EDataLayerRuntimeState CurrentState = DataLayerSubsystem->GetDataLayerInstanceRuntimeState(FurnitureDataLayerAsset);
+		EDataLayerRuntimeState NewState = (CurrentState == EDataLayerRuntimeState::Activated)
+			? EDataLayerRuntimeState::Unloaded
+			: EDataLayerRuntimeState::Activated;
+
+		DataLayerSubsystem->SetDataLayerInstanceRuntimeState(FurnitureDataLayerAsset, NewState);
+
+		FString StateStr = (NewState == EDataLayerRuntimeState::Activated) ? TEXT("Activated") : TEXT("Unloaded");
+		UE_LOG(LogTemp, Warning, TEXT("Data Layer '%s' state changed to: %s"), *FurnitureDataLayerAsset->GetName(), *StateStr);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DataLayerSubsystem not found!"));
 	}
 }
