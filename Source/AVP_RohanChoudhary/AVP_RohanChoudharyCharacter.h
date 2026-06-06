@@ -105,8 +105,6 @@ public:
 
 	virtual void Jump() override;
 
-	virtual void Tick(float DeltaTime) override;
-
 public:
 
 	/** Returns CameraBoom subobject **/

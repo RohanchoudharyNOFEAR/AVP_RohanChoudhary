@@ -124,6 +124,14 @@ void AArchSelectableObject::SetSelectedState(
 	UpdateVisualState();
 }
 
+void AArchSelectableObject::SetHoveredState(
+	bool bNewState)
+{
+	bHovered = bNewState;
+
+	UpdateVisualState();
+}
+
 void AArchSelectableObject::UpdateVisualState()
 {
 	if (!LabelText)
@@ -131,10 +139,33 @@ void AArchSelectableObject::UpdateVisualState()
 		return;
 	}
 
-	LabelText->SetTextRenderColor(
-		bSelected
-		? FColor::Yellow
-		: FColor::White);
+	if (bSelected)
+	{
+		LabelText->SetTextRenderColor(FColor::Yellow);
+		if (Mesh)
+		{
+			Mesh->SetRenderCustomDepth(true);
+			Mesh->SetCustomDepthStencilValue(2);
+		}
+	}
+	else if (bHovered)
+	{
+		LabelText->SetTextRenderColor(FColor::Green);
+		if (Mesh)
+		{
+			Mesh->SetRenderCustomDepth(true);
+			Mesh->SetCustomDepthStencilValue(1);
+		}
+	}
+	else
+	{
+		LabelText->SetTextRenderColor(FColor::White);
+		if (Mesh)
+		{
+			Mesh->SetRenderCustomDepth(false);
+			Mesh->SetCustomDepthStencilValue(0);
+		}
+	}
 }
 
 #if WITH_EDITOR

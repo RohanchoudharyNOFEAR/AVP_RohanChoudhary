@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Data/ArchObjectTypes.h"
 #include "AVP_RohanChoudharyPlayerController.generated.h"
 
 class UInputMappingContext;
 class UUserWidget;
 class UInputAction;
 class AArchObjectManager;
+class AArchSelectableObject;
 
 /**
  *  Basic PlayerController class for a third person game
@@ -65,6 +67,8 @@ public:
 
 	void ToggleControlsOverlay();
 
+	virtual void Tick(float DeltaTime) override;
+
 protected:
 	/** Gameplay initialization */
 	virtual void BeginPlay() override;
@@ -87,10 +91,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Input|Actions")
 	TObjectPtr<UInputAction> RefreshDebugAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input|Actions")
+	TObjectPtr<UInputAction> BackAction;
+
 private:
 
 	UPROPERTY()
 	TObjectPtr<AArchObjectManager> CachedManager;
+
+	UPROPERTY(Transient)
+	AArchSelectableObject* CurrentHoveredObject = nullptr;
 
 	void HandleToggleMathDebug();
 
@@ -100,9 +110,15 @@ private:
 
 	void HandleSaveTempNote();
 
+	void SetNavigationMode(bool bCursorActive);
+
+	void HandleObjectSelectedStateChanged(const FArchObjectInfo& ObjectInfo);
+
 private:
 
 	void HandleSelectPressed();
+
+	void HandleBackPressed();
 
 	AArchObjectManager* FindManager();
 

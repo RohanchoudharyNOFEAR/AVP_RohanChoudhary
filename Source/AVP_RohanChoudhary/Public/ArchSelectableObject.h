@@ -73,18 +73,27 @@ public:
 		Category = "ArchViz")
 	bool bSelected = false;
 
-	
+	UPROPERTY(
+		EditInstanceOnly,
+		BlueprintReadWrite,
+		Category = "ArchViz")
+	bool bHovered = false;
 
 	UFUNCTION(
 		BlueprintCallable,
 		Category = "ArchViz")
 	FArchObjectInfo GetObjectInfo() const;
 
-
 	UFUNCTION(
 		BlueprintCallable,
 		Category = "ArchViz")
 	void SetSelectedState(
+		bool bNewState);
+
+	UFUNCTION(
+		BlueprintCallable,
+		Category = "ArchViz")
+	void SetHoveredState(
 		bool bNewState);
 
 	UFUNCTION(BlueprintNativeEvent, Category = "ArchViz")

@@ -15,7 +15,7 @@
 
 AAVP_RohanChoudharyCharacter::AAVP_RohanChoudharyCharacter()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -180,19 +180,4 @@ void AAVP_RohanChoudharyCharacter::StopSprint()
 	}
 }
 
-void AAVP_RohanChoudharyCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
-	if (GEngine)
-	{
-		FString ModeStr = (GetCharacterMovement()->MaxWalkSpeed > WalkSpeed) ? TEXT("Sprint") : TEXT("Walk");
-		GEngine->AddOnScreenDebugMessage(
-			4445, // Constant key to overwrite the message instead of spamming lines
-			0.1f, // Short duration since it is updated every frame
-			FColor::Cyan,
-			FString::Printf(TEXT("Navigation Mode: Walking | Current Speed: %.0f / Max Speed: %.0f (%s)"), 
-				GetVelocity().Size(), GetCharacterMovement()->MaxWalkSpeed, *ModeStr)
-		);
-	}
-}

@@ -179,11 +179,14 @@ void AMathDebugVisualizer::DrawMathDebug()
 	DebugText +=
 		TEXT("Spline Path Marker");
 
+	// Suppressed on-screen debug text as requested
+	/*
 	GEngine->AddOnScreenDebugMessage(
 		100,
 		0.f,
 		FColor::Yellow,
 		DebugText);
+	*/
 }
 
 AArchObjectManager*

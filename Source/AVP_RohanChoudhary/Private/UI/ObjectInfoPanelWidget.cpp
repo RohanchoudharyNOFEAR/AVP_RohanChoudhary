@@ -34,17 +34,36 @@ void UObjectInfoPanelWidget::NativeConstruct()
 			else
 			{
 				ShowEmptyState();
+				if (MainPanelBorder)
+				{
+					MainPanelBorder->SetVisibility(ESlateVisibility::Collapsed);
+				}
 			}
 		}
 	}
 	else
 	{
 		ShowEmptyState();
+		if (MainPanelBorder)
+		{
+			MainPanelBorder->SetVisibility(ESlateVisibility::Collapsed);
+		}
 	}
 }
 
 void UObjectInfoPanelWidget::HandleObjectSelected(const FArchObjectInfo& ObjectInfo)
 {
+	// If no object is selected (empty ID)
+	if (ObjectInfo.ObjectID.IsNone())
+	{
+		ShowEmptyState();
+		if (MainPanelBorder)
+		{
+			MainPanelBorder->SetVisibility(ESlateVisibility::Collapsed);
+		}
+		return;
+	}
+
 	// Restore panel visibility if it was closed
 	if (MainPanelBorder)
 	{

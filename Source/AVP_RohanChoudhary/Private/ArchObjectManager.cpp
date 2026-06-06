@@ -54,42 +54,16 @@ void AArchObjectManager::BuildObjectDatabase()
 				Info.ObjectID);
 		}
 	}
-	FString DebugText;
-
-	DebugText += TEXT("Object List\n\n");
-
-	for (const FName& ObjectName : ObjectNames)
-	{
-		DebugText +=
-			ObjectName.ToString();
-
-		DebugText += TEXT("\n");
-	}
-
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,
-			20.f,
-			FColor::Cyan,
-			DebugText);
-	}
 }
 
 
 void AArchObjectManager::SelectObject(
 	AArchSelectableObject* NewSelection)
 {
-	if (!NewSelection)
-	{
-		return;
-	}
-
 	if (CurrentSelection == NewSelection)
 	{
 		return;
 	}
-
 
 	if (CurrentSelection)
 	{
@@ -103,15 +77,24 @@ void AArchObjectManager::SelectObject(
 
 	CurrentSelection = NewSelection;
 
-	CurrentSelection->SetSelectedState(true);
+	if (CurrentSelection)
+	{
+		CurrentSelection->SetSelectedState(true);
 
-	const FArchObjectInfo Info = CurrentSelection->GetObjectInfo();
+		const FArchObjectInfo Info = CurrentSelection->GetObjectInfo();
 
-	SelectedObjectIDs.Add(Info.ObjectID);
+		SelectedObjectIDs.Add(Info.ObjectID);
 
-	// Broadcast selection events
-	CurrentSelection->OnObjectSelected(Info);
-	OnObjectSelected.Broadcast(Info);
+		// Broadcast selection events
+		CurrentSelection->OnObjectSelected(Info);
+		OnObjectSelected.Broadcast(Info);
+	}
+	else
+	{
+		// Broadcast empty selection
+		FArchObjectInfo EmptyInfo;
+		OnObjectSelected.Broadcast(EmptyInfo);
+	}
 }
 
 AArchSelectableObject*

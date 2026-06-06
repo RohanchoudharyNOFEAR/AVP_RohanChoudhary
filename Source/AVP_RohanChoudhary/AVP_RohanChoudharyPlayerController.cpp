@@ -21,6 +21,8 @@ void AAVP_RohanChoudharyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	PrimaryActorTick.bCanEverTick = true;
+
 	// only spawn touch controls on local player controllers
 	if (ShouldUseTouchControls() && IsLocalPlayerController())
 	{
@@ -31,21 +33,20 @@ void AAVP_RohanChoudharyPlayerController::BeginPlay()
 		{
 			// add the controls to the player screen
 			MobileControlsWidget->AddToPlayerScreen(0);
-
 		}
 		else {
-
 			UE_LOG(LogAVP_RohanChoudhary, Error, TEXT("Could not spawn mobile controls widget."));
-
 		}
-
 	}
 
 	CachedManager = FindManager();
 
-	bShowMouseCursor = true;
+	if (CachedManager)
+	{
+		CachedManager->OnObjectSelected.AddUObject(this, &AAVP_RohanChoudharyPlayerController::HandleObjectSelectedStateChanged);
+	}
 
-
+	SetNavigationMode(false); // Start in free-look (no cursor)
 }
 
 void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
@@ -112,6 +113,15 @@ void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
 				this,
 				&AAVP_RohanChoudharyPlayerController::HandleRefreshDebug);
 		}
+
+		if (BackAction)
+		{
+			EnhancedInput->BindAction(
+				BackAction,
+				ETriggerEvent::Started,
+				this,
+				&AAVP_RohanChoudharyPlayerController::HandleBackPressed);
+		}
 	}
 
 	if (InputComponent)
@@ -140,22 +150,34 @@ bool AAVP_RohanChoudharyPlayerController::ShouldUseTouchControls() const
 
 void AAVP_RohanChoudharyPlayerController::HandleSelectPressed()
 {
-	ShowInputDebugMessage(TEXT("Select Object"));
-
 	UE_LOG(
 		LogTemp,
 		Warning,
 		TEXT("select clicked"));
+
 	FHitResult Hit;
+	bool bHit = false;
 
-	GetHitResultUnderCursor(
-		ECC_Visibility,
-		false,
-		Hit);
+	if (bShowMouseCursor)
+	{
+		bHit = GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	}
+	else
+	{
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetPlayerViewPoint(CameraLocation, CameraRotation);
+		FVector End = CameraLocation + (CameraRotation.Vector() * 10000.f);
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(GetPawn());
+		bHit = GetWorld()->LineTraceSingleByChannel(Hit, CameraLocation, End, ECC_Visibility, QueryParams);
+	}
 
-	AArchSelectableObject* Object =
-		Cast<AArchSelectableObject>(
-			Hit.GetActor());
+	AArchSelectableObject* Object = nullptr;
+	if (bHit && Hit.GetActor())
+	{
+		Object = Cast<AArchSelectableObject>(Hit.GetActor());
+	}
 
 	if (Object)
 	{
@@ -164,6 +186,15 @@ void AAVP_RohanChoudharyPlayerController::HandleSelectPressed()
 			Warning,
 			TEXT("Hit Object: %s"),
 			*Object->GetName());
+
+		if (ObjectInfoPanelWidgetClass && !ObjectInfoPanelWidget)
+		{
+			ObjectInfoPanelWidget = CreateWidget<UUserWidget>(this, ObjectInfoPanelWidgetClass);
+			if (ObjectInfoPanelWidget)
+			{
+				ObjectInfoPanelWidget->AddToViewport(10);
+			}
+		}
 	}
 	else
 	{
@@ -171,11 +202,6 @@ void AAVP_RohanChoudharyPlayerController::HandleSelectPressed()
 			LogTemp,
 			Warning,
 			TEXT("Hit Actor but NOT ArchSelectableObject"));
-	}
-
-	if (!Object)
-	{
-		return;
 	}
 
 	if (CachedManager)
@@ -243,15 +269,7 @@ void AAVP_RohanChoudharyPlayerController::HandleSaveTempNote()
 
 void AAVP_RohanChoudharyPlayerController::ShowInputDebugMessage(const FString& ActionName)
 {
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			4444,
-			5.0f,
-			FColor::Green,
-			FString::Printf(TEXT("Last Input Action: %s"), *ActionName)
-		);
-	}
+	// Suppressed on-screen debug messages as requested
 }
 
 void AAVP_RohanChoudharyPlayerController::ToggleControlsOverlay()
@@ -277,5 +295,87 @@ void AAVP_RohanChoudharyPlayerController::ToggleControlsOverlay()
 		{
 			ControlsOverlayWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
 		}
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	FHitResult Hit;
+	bool bHit = false;
+
+	if (bShowMouseCursor)
+	{
+		bHit = GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+	}
+	else
+	{
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetPlayerViewPoint(CameraLocation, CameraRotation);
+		FVector End = CameraLocation + (CameraRotation.Vector() * 10000.f);
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(GetPawn());
+		bHit = GetWorld()->LineTraceSingleByChannel(Hit, CameraLocation, End, ECC_Visibility, QueryParams);
+	}
+
+	AArchSelectableObject* HoveredObject = nullptr;
+	if (bHit && Hit.GetActor())
+	{
+		HoveredObject = Cast<AArchSelectableObject>(Hit.GetActor());
+	}
+
+	if (CurrentHoveredObject != HoveredObject)
+	{
+		if (CurrentHoveredObject)
+		{
+			CurrentHoveredObject->SetHoveredState(false);
+		}
+
+		CurrentHoveredObject = HoveredObject;
+
+		if (CurrentHoveredObject)
+		{
+			CurrentHoveredObject->SetHoveredState(true);
+		}
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::HandleBackPressed()
+{
+	if (CachedManager)
+	{
+		CachedManager->SelectObject(nullptr);
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::SetNavigationMode(bool bCursorActive)
+{
+	bShowMouseCursor = bCursorActive;
+
+	if (bCursorActive)
+	{
+		FInputModeGameAndUI InputMode;
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockAlways);
+		InputMode.SetHideCursorDuringCapture(false);
+		SetInputMode(InputMode);
+	}
+	else
+	{
+		FInputModeGameOnly InputMode;
+		SetInputMode(InputMode);
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::HandleObjectSelectedStateChanged(const FArchObjectInfo& ObjectInfo)
+{
+	if (ObjectInfo.ObjectID.IsNone())
+	{
+		SetNavigationMode(false);
+	}
+	else
+	{
+		SetNavigationMode(true);
 	}
 }

@@ -7,10 +7,9 @@
 #include "Data/ArchObjectTypes.h"
 #include "BPL_ArchVizUtilities.generated.h"
 
-// Consistent debug printing macro: logs to Output Log and prints on screen in yellow
+// Consistent debug printing macro: logs to Output Log
 #define ARCHVIZ_LOG(Format, ...) \
-	UE_LOG(LogTemp, Warning, Format, ##__VA_ARGS__); \
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow, FString::Printf(Format, ##__VA_ARGS__));
+	UE_LOG(LogTemp, Warning, Format, ##__VA_ARGS__);
 
 /**
  * Utility library for ArchViz visualizer
