@@ -49,6 +49,18 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Input")
 	UInputAction* MouseLookAction;
 
+	/** Sprint Input Action */
+	UPROPERTY(EditAnywhere, Category="Input")
+	UInputAction* SprintAction;
+
+	/** Normal walking speed */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement")
+	float WalkSpeed;
+
+	/** Sprinting speed */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Movement")
+	float SprintSpeed;
+
 public:
 
 	/** Constructor */
@@ -66,6 +78,12 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	/** Called to start sprinting */
+	void StartSprint();
+
+	/** Called to stop sprinting */
+	void StopSprint();
 
 public:
 
@@ -86,6 +104,8 @@ public:
 	virtual void DoJumpEnd();
 
 	virtual void Jump() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 public:
 

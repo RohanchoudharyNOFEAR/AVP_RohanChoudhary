@@ -15,6 +15,8 @@
 
 AAVP_RohanChoudharyCharacter::AAVP_RohanChoudharyCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 		
@@ -31,7 +33,10 @@ AAVP_RohanChoudharyCharacter::AAVP_RohanChoudharyCharacter()
 	// instead of recompiling to adjust them
 	GetCharacterMovement()->JumpZVelocity = 500.f;
 	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
+
+	WalkSpeed = 300.f;
+	SprintSpeed = 700.f;
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
@@ -46,6 +51,7 @@ AAVP_RohanChoudharyCharacter::AAVP_RohanChoudharyCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
+	FollowCamera->FieldOfView = 90.f;
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -66,6 +72,10 @@ void AAVP_RohanChoudharyCharacter::SetupPlayerInputComponent(UInputComponent* Pl
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AAVP_RohanChoudharyCharacter::Look);
+
+		// Sprinting
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &AAVP_RohanChoudharyCharacter::StartSprint);
+		EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &AAVP_RohanChoudharyCharacter::StopSprint);
 	}
 	else
 	{
@@ -149,5 +159,40 @@ void AAVP_RohanChoudharyCharacter::Jump()
 	if (AAVP_RohanChoudharyPlayerController* PC = Cast<AAVP_RohanChoudharyPlayerController>(GetController()))
 	{
 		PC->ShowInputDebugMessage(TEXT("Jump"));
+	}
+}
+
+void AAVP_RohanChoudharyCharacter::StartSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
+	if (AAVP_RohanChoudharyPlayerController* PC = Cast<AAVP_RohanChoudharyPlayerController>(GetController()))
+	{
+		PC->ShowInputDebugMessage(TEXT("Start Sprint"));
+	}
+}
+
+void AAVP_RohanChoudharyCharacter::StopSprint()
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+	if (AAVP_RohanChoudharyPlayerController* PC = Cast<AAVP_RohanChoudharyPlayerController>(GetController()))
+	{
+		PC->ShowInputDebugMessage(TEXT("Stop Sprint"));
+	}
+}
+
+void AAVP_RohanChoudharyCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (GEngine)
+	{
+		FString ModeStr = (GetCharacterMovement()->MaxWalkSpeed > WalkSpeed) ? TEXT("Sprint") : TEXT("Walk");
+		GEngine->AddOnScreenDebugMessage(
+			4445, // Constant key to overwrite the message instead of spamming lines
+			0.1f, // Short duration since it is updated every frame
+			FColor::Cyan,
+			FString::Printf(TEXT("Navigation Mode: Walking | Current Speed: %.0f / Max Speed: %.0f (%s)"), 
+				GetVelocity().Size(), GetCharacterMovement()->MaxWalkSpeed, *ModeStr)
+		);
 	}
 }
