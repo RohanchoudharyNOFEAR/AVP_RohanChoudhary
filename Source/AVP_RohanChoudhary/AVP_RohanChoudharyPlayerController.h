@@ -104,6 +104,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DataLayers")
 	TObjectPtr<UDataLayerAsset> FurnitureDataLayerAsset;
 
+	UPROPERTY(EditAnywhere, Category = "Input|Actions")
+	TObjectPtr<UInputAction> ToggleDoorAction;
+
 private:
 
 	UPROPERTY()
@@ -129,6 +132,8 @@ private:
 	void HandleSelectPressed();
 
 	void HandleBackPressed();
+
+	void HandleToggleDoor();
 
 	AArchObjectManager* FindManager();
 

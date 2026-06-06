@@ -13,6 +13,7 @@
 #include "MeasurementUtility/MathDebugVisualizer.h"
 #include "ArchObjectManager.h"
 #include "ArchSelectableObject.h"
+#include "ArchAnimatedDoor.h"
 #include "TypePracticeDisplay.h"
 #include "BPL_ArchVizUtilities.h"
 #include "EngineUtils.h"
@@ -134,6 +135,15 @@ void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
 				ETriggerEvent::Started,
 				this,
 				&AAVP_RohanChoudharyPlayerController::HandleToggleFurniture);
+		}
+
+		if (ToggleDoorAction)
+		{
+			EnhancedInput->BindAction(
+				ToggleDoorAction,
+				ETriggerEvent::Started,
+				this,
+				&AAVP_RohanChoudharyPlayerController::HandleToggleDoor);
 		}
 	}
 
@@ -420,5 +430,46 @@ void AAVP_RohanChoudharyPlayerController::HandleToggleFurniture()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("DataLayerSubsystem not found!"));
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::HandleToggleDoor()
+{
+	// Log the input event
+	UE_LOG(LogTemp, Warning, TEXT("Toggle Door input event received (P Key)."));
+
+	APawn* PlayerPawn = GetPawn();
+	if (!PlayerPawn)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("HandleToggleDoor: Player Pawn not found!"));
+		return;
+	}
+
+	FVector PlayerLoc = PlayerPawn->GetActorLocation();
+	AArchAnimatedDoor* NearestDoor = nullptr;
+	float NearestDistance = TNumericLimits<float>::Max();
+
+	for (TActorIterator<AArchAnimatedDoor> It(GetWorld()); It; ++It)
+	{
+		AArchAnimatedDoor* Door = *It;
+		if (Door)
+		{
+			float Dist = FVector::Distance(PlayerLoc, Door->GetActorLocation());
+			if (Dist < NearestDistance)
+			{
+				NearestDistance = Dist;
+				NearestDoor = Door;
+			}
+		}
+	}
+
+	if (NearestDoor)
+	{
+		NearestDoor->ToggleDoor();
+		UE_LOG(LogTemp, Warning, TEXT("Toggled nearest door: %s"), *NearestDoor->GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No ArchAnimatedDoor actors found in the level!"));
 	}
 }
