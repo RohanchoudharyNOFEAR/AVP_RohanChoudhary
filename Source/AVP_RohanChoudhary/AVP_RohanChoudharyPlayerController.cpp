@@ -435,8 +435,22 @@ void AAVP_RohanChoudharyPlayerController::HandleToggleFurniture()
 
 void AAVP_RohanChoudharyPlayerController::HandleToggleDoor()
 {
-	// Log the input event
 	UE_LOG(LogTemp, Warning, TEXT("Toggle Door input event received (P Key)."));
+
+	// Check if a door is currently selected and toggle it if so
+	if (CachedManager)
+	{
+		AArchSelectableObject* Selected = CachedManager->GetCurrentSelection();
+		if (Selected)
+		{
+			if (AArchAnimatedDoor* SelectedDoor = Cast<AArchAnimatedDoor>(Selected))
+			{
+				SelectedDoor->ToggleDoor();
+				UE_LOG(LogTemp, Warning, TEXT("Toggled selected door: %s"), *SelectedDoor->GetName());
+				return;
+			}
+		}
+	}
 
 	APawn* PlayerPawn = GetPawn();
 	if (!PlayerPawn)

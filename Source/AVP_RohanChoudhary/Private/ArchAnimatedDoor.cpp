@@ -4,6 +4,7 @@
 #include "ArchAnimatedDoor.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Components/TextRenderComponent.h"
 
 // Sets default values
 AArchAnimatedDoor::AArchAnimatedDoor()
@@ -11,11 +12,12 @@ AArchAnimatedDoor::AArchAnimatedDoor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
-	RootComponent = DefaultSceneRoot;
+	DefaultSceneRoot = Root; // Reuse parent's Root
 
 	FrameMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FrameMesh"));
 	FrameMesh->SetupAttachment(RootComponent);
+
+	Mesh = FrameMesh.Get(); // Redirect parent highlights to FrameMesh
 
 	DoorMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DoorMesh"));
 	DoorMesh->SetupAttachment(FrameMesh);
@@ -28,6 +30,12 @@ AArchAnimatedDoor::AArchAnimatedDoor()
 	OpenedLocalLocation = FVector(0.f, 0.f, 300.f); // Default sliding up by 300 units
 	bIsDoorOpen = false;
 }
+
+void AArchAnimatedDoor::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
 
 void AArchAnimatedDoor::ToggleDoor()
 {

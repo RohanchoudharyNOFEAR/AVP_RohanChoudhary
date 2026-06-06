@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "ArchSelectableObject.h"
 #include "ArchAnimatedDoor.generated.h"
 
 class UStaticMeshComponent;
@@ -13,7 +13,7 @@ class UWidgetComponent;
  * An interactive architectural door component that slides up and down driven by a Timeline.
  */
 UCLASS()
-class AVP_ROHANCHOUDHARY_API AArchAnimatedDoor : public AActor
+class AVP_ROHANCHOUDHARY_API AArchAnimatedDoor : public AArchSelectableObject
 {
 	GENERATED_BODY()
 	
@@ -22,6 +22,8 @@ public:
 	AArchAnimatedDoor();
 
 protected:
+	virtual void BeginPlay() override;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
 
