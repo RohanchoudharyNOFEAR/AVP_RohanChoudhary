@@ -42,7 +42,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DoorSettings")
 	FVector OpenedLocalLocation;
 
-	UPROPERTY(BlueprintReadOnly, Category = "DoorSettings")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Interp, Category = "DoorSettings")
 	bool bIsDoorOpen = false;
 
 public:
