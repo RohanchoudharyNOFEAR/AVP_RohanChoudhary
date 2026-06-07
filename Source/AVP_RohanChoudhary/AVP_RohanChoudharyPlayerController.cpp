@@ -21,6 +21,7 @@
 #include "WorldPartition/DataLayer/DataLayerSubsystem.h"
 #include "WorldPartition/DataLayer/DataLayerAsset.h"
 #include "WorldPartition/DataLayer/DataLayerInstance.h"
+#include "UI/DesignOptionSwitcherWidget.h"
 
 void AAVP_RohanChoudharyPlayerController::BeginPlay()
 {
@@ -151,6 +152,7 @@ void AAVP_RohanChoudharyPlayerController::SetupInputComponent()
 	{
 		InputComponent->BindKey(EKeys::N, IE_Pressed, this, &AAVP_RohanChoudharyPlayerController::HandleSaveTempNote);
 		InputComponent->BindKey(EKeys::H, IE_Pressed, this, &AAVP_RohanChoudharyPlayerController::ToggleControlsOverlay);
+		InputComponent->BindKey(EKeys::M, IE_Pressed, this, &AAVP_RohanChoudharyPlayerController::ToggleDesignSwitcher);
 	}
 }
 
@@ -485,5 +487,47 @@ void AAVP_RohanChoudharyPlayerController::HandleToggleDoor()
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No ArchAnimatedDoor actors found in the level!"));
+	}
+}
+
+void AAVP_RohanChoudharyPlayerController::ToggleDesignSwitcher()
+{
+	if (!DesignSwitcherWidget && DesignSwitcherWidgetClass)
+	{
+		DesignSwitcherWidget = CreateWidget<UUserWidget>(this, DesignSwitcherWidgetClass);
+		if (DesignSwitcherWidget)
+		{
+			DesignSwitcherWidget->AddToViewport(20);
+		}
+	}
+
+	if (DesignSwitcherWidget)
+	{
+		if (DesignSwitcherWidget->GetVisibility() == ESlateVisibility::Visible ||
+			DesignSwitcherWidget->GetVisibility() == ESlateVisibility::SelfHitTestInvisible)
+		{
+			DesignSwitcherWidget->SetVisibility(ESlateVisibility::Collapsed);
+			
+			// Restore navigation mode based on selection
+			bool bHasSelection = false;
+			if (CachedManager)
+			{
+				bHasSelection = (CachedManager->GetCurrentSelection() != nullptr);
+			}
+			SetNavigationMode(bHasSelection);
+		}
+		else
+		{
+			DesignSwitcherWidget->SetVisibility(ESlateVisibility::SelfHitTestInvisible);
+			
+			// Route focus and input to the UI
+			SetNavigationMode(true);
+			
+			if (UDesignOptionSwitcherWidget* Switcher = Cast<UDesignOptionSwitcherWidget>(DesignSwitcherWidget))
+			{
+				Switcher->RefreshUI();
+				Switcher->FocusActiveOption();
+			}
+		}
 	}
 }

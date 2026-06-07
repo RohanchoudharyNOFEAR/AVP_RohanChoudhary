@@ -59,6 +59,12 @@ protected:
 	UPROPERTY()
 	UUserWidget* ControlsOverlayWidget = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = "UI")
+	TSubclassOf<UUserWidget> DesignSwitcherWidgetClass;
+
+	UPROPERTY()
+	UUserWidget* DesignSwitcherWidget = nullptr;
+
 	/** If true, the player will use UMG touch controls even if not playing on mobile platforms */
 	UPROPERTY(EditAnywhere, Config, Category = "Input|Touch Controls")
 	bool bForceTouchControls = false;
@@ -67,6 +73,8 @@ public:
 	void ShowInputDebugMessage(const FString& ActionName);
 
 	void ToggleControlsOverlay();
+
+	void ToggleDesignSwitcher();
 
 	UFUNCTION(BlueprintCallable, Category = "DataLayers")
 	void HandleToggleFurniture();
